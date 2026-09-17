@@ -1,0 +1,165 @@
+#!/bin/bash
+
+set -u
+
+
+log() {
+    echo "[PowerSwitch] $*"
+}
+
+
+error() {
+    echo "[PowerSwitch] ERROR: $*" >&2
+}
+
+
+shutdown() {
+    log "PowerSwitch stopped"
+    exit 0
+}
+
+
+find_ac_adapter() {
+    for device in /sys/class/power_supply/*; do
+        [ -f "$device/type" ] || continue
+
+        device_type="$(cat "$device/type" 2>/dev/null)" || continue
+
+        if [ "$device_type" = "Mains" ]; then
+            echo "$device"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+
+get_power_state() {
+    local ac_adapter="$1"
+    local online
+
+    if [ ! -f "$ac_adapter/online" ]; then
+        error "AC adapter status file not found: $ac_adapter/online"
+        return 1
+    fi
+
+    online="$(cat "$ac_adapter/online" 2>/dev/null)" || {
+        error "Failed to read AC adapter status."
+        return 1
+    }
+
+    if [ "$online" = "1" ]; then
+        echo "ac"
+    elif [ "$online" = "0" ]; then
+        echo "battery"
+    else
+        error "Unknown AC adapter status: $online"
+        return 1
+    fi
+}
+
+
+apply_power_profile() {
+    local power_state="$1"
+    local target_profile
+    local current_profile
+
+    if [ "$power_state" = "ac" ]; then
+        target_profile="performance"
+    elif [ "$power_state" = "battery" ]; then
+        target_profile="power-saver"
+    else
+        error "Unknown power state: $power_state"
+        return 1
+    fi
+
+    current_profile="$(powerprofilesctl get 2>/dev/null)" || {
+        error "Failed to get current power profile."
+        return 1
+    }
+
+    if [ "$current_profile" = "$target_profile" ]; then
+        log "Power profile already set to: $target_profile"
+        return 0
+    fi
+
+    log "Changing power profile: $current_profile -> $target_profile"
+
+    if powerprofilesctl set "$target_profile"; then
+        log "Power profile changed to: $target_profile"
+    else
+        error "Failed to set power profile to: $target_profile"
+        return 1
+    fi
+}
+
+
+main() {
+    
+    trap shutdown SIGTERM
+    trap shutdown SIGINT
+    log "Starting PowerSwitch"
+
+
+    if ! command -v udevadm >/dev/null 2>&1; then
+        error "udevadm is not installed."
+        exit 1
+    fi
+
+    if ! command -v powerprofilesctl >/dev/null 2>&1; then
+        error "powerprofilesctl is not installed."
+        exit 1
+    fi
+
+
+    AC_ADAPTER="$(find_ac_adapter)"
+
+    if [ -z "$AC_ADAPTER" ]; then
+        error "No AC adapter found."
+        exit 1
+    fi
+
+
+    AC_NAME="$(basename "$AC_ADAPTER")"
+
+
+    log "AC adapter: $AC_ADAPTER"
+    log "AC adapter name: $AC_NAME"
+
+
+    CURRENT_STATE="$(get_power_state "$AC_ADAPTER")" || exit 1
+
+    log "Current power state: $CURRENT_STATE"
+
+
+    apply_power_profile "$CURRENT_STATE" || exit 1
+
+
+    log "Waiting for power events..."
+
+
+    udevadm monitor --kernel --subsystem-match=power_supply |
+    while read -r line; do
+
+        if echo "$line" | grep -q "/power_supply/$AC_NAME"; then
+
+            NEW_STATE="$(get_power_state "$AC_ADAPTER")" || continue
+
+            if [ "$NEW_STATE" != "$CURRENT_STATE" ]; then
+
+                CURRENT_STATE="$NEW_STATE"
+
+                log "Power state changed: $CURRENT_STATE"
+
+                apply_power_profile "$CURRENT_STATE"
+
+            fi
+
+        fi
+
+    done
+}
+
+
+main

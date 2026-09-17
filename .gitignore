@@ -1,0 +1,25 @@
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*~
+
+# Test / coverage artifacts
+.coverage
+coverage/
+.pytest_cache/
+
+# ShellCheck / tooling
+.shellcheckrc.local
+
+# Local development files
+.env
+.env.*

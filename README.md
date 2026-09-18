@@ -1,116 +1,234 @@
 # PowerSwitch
 
-> Automatically switch your Linux power profile when you plug in or unplug your laptop. PowerSwitch listens for power-supply events through udev and applies the appropriate `powerprofilesctl` profile without polling.
+A lightweight Linux utility that automatically switches power profiles between **performance** and **power-saver** modes based on AC power connection status.
 
-![Shell](https://img.shields.io/badge/shell-bash-green.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Linux-lightgrey.svg)
-
----
-
-## Why PowerSwitch?
-
-Power management tools can be much larger than what you need if all you want is automatic profile switching.
-
-PowerSwitch focuses on one task:
-
-> Listen for AC adapter events → apply the appropriate power profile.
-
-It uses an event-driven approach instead of repeatedly polling the system.
-
-| Feature                      | PowerSwitch                 | TLP                   | auto-cpufreq           |
-| ---------------------------- | --------------------------- | --------------------- | ---------------------- |
-| Event-driven power switching | ✅                           | ❌                     | ❌                      |
-| Main purpose                 | Profile switching           | Full power management | CPU/power optimization |
-| Runtime                      | Bash + systemd user service | Multiple components   | Python + daemon        |
-| Configuration required       | None                        | Optional/configurable | Optional/configurable  |
-
----
+PowerSwitch monitors power supply events and changes the active power profile automatically using `powerprofilesctl`.
 
 ## Features
 
-* ⚡ **Event-driven** — reacts to power-supply events using `udevadm`
-* 🪶 **Lightweight** — a small Bash daemon with a systemd user service
-* 🔌 **Automatic AC detection** — discovers the AC adapter through the Linux `power_supply` subsystem
-* 🛠️ **Simple installation** — install and uninstall with a single command
-* 🛑 **Graceful shutdown** — handles `SIGTERM` and `SIGINT`
-* 🔄 **Boot-time synchronization** — applies the correct profile when the service starts
-* ✅ **Tested** — includes automated tests and ShellCheck validation
+* Automatic switching between AC and battery power modes
+* Performance profile when the charger is connected
+* Power-saver profile when running on battery
+* Real-time power event monitoring using `udev`
+* Lightweight Bash implementation
+* Runs as a user-level systemd service
+* Automated test suite
+* ShellCheck validated
+* Simple installation and removal scripts
 
----
+## How It Works
 
-## How it works
+PowerSwitch monitors Linux power supply events:
 
-PowerSwitch maps the current power state to a power profile:
+```
+AC connected
+      |
+      v
+Detect power change
+      |
+      v
+Enable performance profile
+```
 
-| Power State      | Profile       |
-| ---------------- | ------------- |
-| 🔌 AC plugged in | `performance` |
-| 🔋 On battery    | `power-saver` |
+```
+AC disconnected
+      |
+      v
+Detect power change
+      |
+      v
+Enable power-saver profile
+```
 
-When the service starts, PowerSwitch:
+The project uses:
 
-1. Detects the available AC adapter.
-2. Reads its current `online` state.
-3. Applies the corresponding power profile.
-4. Starts listening for power-supply events.
-5. Changes the profile only when the power state changes.
-
-While waiting for events, the daemon remains idle instead of continuously polling the system.
-
----
+* `udev` for detecting power supply changes
+* `systemd --user` for background service management
+* `powerprofilesctl` for changing power profiles
 
 ## Requirements
 
-* Linux with `systemd` user services
+PowerSwitch requires:
+
+* Linux
 * Bash
-* `udevadm`
-* [`power-profiles-daemon`](https://gitlab.freedesktop.org/upower/power-profiles-daemon) providing `powerprofilesctl`
+* systemd user services
+* udev
+* power-profiles-daemon
 
-**Tested on:** Ubuntu Linux
+Check available power profiles:
 
-> PowerSwitch is intended for Linux systems using `systemd`, `udev`, and `power-profiles-daemon`. Compatibility with other distributions may depend on their power-management configuration.
-
----
+```bash
+powerprofilesctl list
+```
 
 ## Installation
 
-Clone the repository and run the installer:
+Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/power-switch.git
-cd power-switch
+git clone https://github.com/Radiance-git/PowerSwitch.git
+```
+
+Enter the project directory:
+
+```bash
+cd PowerSwitch
+```
+
+Run the installer:
+
+```bash
 ./install.sh
 ```
 
-The installer:
+The installer will:
 
-1. Copies the PowerSwitch executable to `~/.local/bin/power-switch`
-2. Installs the systemd user service
-3. Reloads the systemd user manager
-4. Enables the service
-5. Starts the service
+* Install the PowerSwitch executable
+* Create the systemd user service
+* Enable automatic startup
+* Start the service
 
-Check the service status:
+## Usage
+
+After installation, PowerSwitch runs automatically in the background.
+
+Check service status:
 
 ```bash
 systemctl --user status power-switch.service
 ```
 
-You should see:
-
-```text
-Active: active (running)
-```
-
----
-
-## Service management
-
-Check whether the service is running:
+View logs:
 
 ```bash
-systemctl --user is-active power-switch.service
+journalctl --user -u power-switch.service -f
+```
+
+## Service Management
+
+Start:
+
+```bash
+systemctl --user start power-switch.service
+```
+
+Stop:
+
+```bash
+systemctl --user stop power-switch.service
+```
+
+Restart:
+
+```bash
+systemctl --user restart power-switch.service
+```
+
+Enable at startup:
+
+```bash
+systemctl --user enable power-switch.service
+```
+
+Disable startup:
+
+```bash
+systemctl --user disable power-switch.service
+```
+
+## Uninstallation
+
+To remove PowerSwitch:
+
+```bash
+./uninstall.sh
+```
+
+The uninstall script removes:
+
+* Installed executable
+* systemd user service
+* Service configuration
+
+## Testing
+
+PowerSwitch includes an automated test suite.
+
+Run:
+
+```bash
+./tests/test.sh
+```
+
+The tests verify:
+
+* Source file availability
+* Bash syntax
+* ShellCheck compliance
+* Required functions
+* Required commands
+* Power state detection
+* Multiple power adapters handling
+* Profile mapping
+* Invalid input handling
+* Profile update behavior
+
+Current test status:
+
+```
+32 tests passed
+0 tests failed
+```
+
+## Project Structure
+
+```
+PowerSwitch/
+│
+├── src/
+│   └── power-switch
+│
+├── systemd/
+│   └── power-switch.service
+│
+├── tests/
+│   └── test.sh
+│
+├── install.sh
+├── uninstall.sh
+│
+├── README.md
+├── SECURITY.md
+├── LICENSE
+│
+└── .github/
+    └── workflows/
+        └── ci.yml
+```
+
+## Troubleshooting
+
+### Power profile does not change
+
+Check available profiles:
+
+```bash
+powerprofilesctl list
+```
+
+Check power-profiles-daemon:
+
+```bash
+systemctl status power-profiles-daemon
+```
+
+### Service problems
+
+View service logs:
+
+```bash
+journalctl --user -u power-switch.service
 ```
 
 Restart the service:
@@ -119,121 +237,40 @@ Restart the service:
 systemctl --user restart power-switch.service
 ```
 
-Stop the service:
+## Limitations
 
-```bash
-systemctl --user stop power-switch.service
-```
-
-View service logs:
-
-```bash
-journalctl --user -u power-switch.service
-```
-
-Follow logs in real time:
-
-```bash
-journalctl --user -u power-switch.service -f
-```
-
----
-
-## Manual usage
-
-The installed executable can also be run directly:
-
-```bash
-~/.local/bin/power-switch
-```
-
-This is useful for development and debugging.
-
-Press `Ctrl+C` to stop it gracefully.
-
----
-
-## Testing
-
-Run the project test suite:
-
-```bash
-./tests/test.sh
-```
-
-The test suite checks the project structure, core implementation, required behavior, and ShellCheck validation.
-
-You can also run ShellCheck directly:
-
-```bash
-shellcheck src/power-switch
-```
-
----
-
-## Uninstallation
-
-From the project directory:
-
-```bash
-./uninstall.sh
-```
-
-The uninstaller:
-
-* Stops the service
-* Disables the service
-* Removes the installed systemd user service
-* Removes the installed executable
-
-The source code in the project directory is not removed.
-
----
-
-## Project structure
-
-```text
-power-switch/
-├── src/
-│   └── power-switch           # Main daemon script
-├── systemd/
-│   └── power-switch.service   # systemd user service unit
-├── tests/
-│   └── test.sh                # Test suite + ShellCheck
-├── install.sh                 # Installation script
-├── uninstall.sh               # Uninstallation script
-├── .gitignore
-└── README.md
-```
-
----
-
-## Roadmap
-
-* [ ] Configurable power profiles
-* [ ] Support for multiple AC adapters
-* [ ] `--once` mode for testing
-* [ ] Dry-run mode
-* [ ] Optional desktop notifications
-* [ ] Error scenario tests
-* [ ] GitHub Actions CI
-
----
+* Requires Linux systems with `power-profiles-daemon`
+* Depends on kernel power supply information
+* Tested primarily on Ubuntu-based systems
 
 ## Contributing
 
 Contributions are welcome.
 
-Before submitting a pull request, run:
+Before submitting changes:
+
+Run ShellCheck:
+
+```bash
+shellcheck src/power-switch install.sh uninstall.sh tests/test.sh
+```
+
+Run tests:
 
 ```bash
 ./tests/test.sh
 ```
 
-Make sure all tests pass and ShellCheck reports no issues.
+Please keep changes focused and include tests for new behavior.
 
----
+## Security
+
+For security reports, please read:
+
+[SECURITY.md](SECURITY.md)
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License.
+
+See [LICENSE](LICENSE) for details.

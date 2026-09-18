@@ -1,12 +1,16 @@
 [Unit]
 Description=PowerSwitch - Automatic power profile switching
-After=graphical-session.target
+After=graphical-session.target power-profiles-daemon.service
+Wants=power-profiles-daemon.service
 
 [Service]
 Type=simple
 ExecStart=%h/.local/bin/power-switch
 Restart=on-failure
 RestartSec=5
+
+# Make the service independent of the shell environment.
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%h/.local/bin
 
 [Install]
 WantedBy=default.target

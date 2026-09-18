@@ -13,16 +13,13 @@ SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
 INSTALL_PATH="$BIN_DIR/power-switch"
 INSTALLED_SERVICE="$SYSTEMD_USER_DIR/power-switch.service"
 
-
-error() {
-    echo "[PowerSwitch] ERROR: $*" >&2
-}
-
-
 log() {
     echo "[PowerSwitch] $*"
 }
 
+error() {
+    echo "[PowerSwitch] ERROR: $*" >&2
+}
 
 check_command() {
     local command_name="$1"
@@ -32,7 +29,6 @@ check_command() {
         return 1
     fi
 }
-
 
 main() {
     log "Installing PowerSwitch..."
@@ -47,30 +43,51 @@ main() {
         exit 1
     fi
 
-    check_command systemctl || exit 1
-    check_command udevadm || exit 1
-    check_command powerprofilesctl || exit 1
+    for command in systemctl udevadm powerprofilesctl; do
+        check_command "$command" || exit 1
+    done
 
-    mkdir -p "$BIN_DIR"
-    mkdir -p "$SYSTEMD_USER_DIR"
+    mkdir -p "$BIN_DIR" "$SYSTEMD_USER_DIR" || {
+        error "Failed to create installation directories."
+        exit 1
+    }
 
-    chmod +x "$SOURCE_FILE"
+    chmod +x "$SOURCE_FILE" || {
+        error "Failed to make source executable."
+        exit 1
+    }
 
-    cp "$SOURCE_FILE" "$INSTALL_PATH"
-    cp "$SERVICE_FILE" "$INSTALLED_SERVICE"
+    install -m 0755 "$SOURCE_FILE" "$INSTALL_PATH" || {
+        error "Failed to install executable."
+        exit 1
+    }
 
-    systemctl --user daemon-reload
+    install -m 0644 "$SERVICE_FILE" "$INSTALLED_SERVICE" || {
+        error "Failed to install systemd service."
+        exit 1
+    }
 
-    systemctl --user enable power-switch.service
-    systemctl --user restart power-switch.service
+    systemctl --user daemon-reload || {
+        error "Failed to reload systemd user manager."
+        exit 1
+    }
+
+    systemctl --user enable power-switch.service || {
+        error "Failed to enable PowerSwitch service."
+        exit 1
+    }
+
+    systemctl --user restart power-switch.service || {
+        error "Failed to start PowerSwitch service."
+        exit 1
+    }
 
     log "PowerSwitch installed successfully."
     log "Executable: $INSTALL_PATH"
     log "Service: $INSTALLED_SERVICE"
-    log "Service status:"
 
-    systemctl --user --no-pager --full status power-switch.service
+    echo
+    systemctl --user --no-pager --full status power-switch.service || true
 }
-
 
 main

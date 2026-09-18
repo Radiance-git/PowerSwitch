@@ -1,0 +1,1105 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.github/
+  ISSUE_TEMPLATE/
+    bug_report.md
+    feature_request.md
+    pull_request_template.md
+  workflows/
+    ci.yml
+src/
+  power-switch
+systemd/
+  power-switch.service
+tests/
+  test.sh
+.gitignore
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+install.sh
+LICENSE
+README.md
+uninstall.sh
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".github/ISSUE_TEMPLATE/bug_report.md">
+---
+name: Bug report
+about: Report unexpected behavior in PowerSwitch
+title: "[Bug] "
+labels: bug
+assignees: ''
+---
+
+**Describe the bug**
+A clear description of what's going wrong.
+
+**To reproduce**
+Steps to reproduce the behavior:
+1. Run '...'
+2. Plug/unplug AC adapter
+3. See error / wrong profile applied
+
+**Expected behavior**
+What you expected to happen instead.
+
+**Logs**
+Paste relevant output from:
+```bash
+journalctl --user -u power-switch.service -n 50
+```
+
+**Environment**
+- Distro / version: [e.g. Ubuntu 24.04]
+- Desktop environment: [e.g. GNOME, KDE]
+- `power-profiles-daemon` version: `powerprofilesctl --version`
+- Output of `systemctl --user status power-switch.service`
+
+**Additional context**
+Anything else relevant (multiple batteries/adapters, custom udev rules, etc).
+</file>
+
+<file path=".github/ISSUE_TEMPLATE/feature_request.md">
+---
+name: Feature request
+about: Suggest an idea for PowerSwitch
+title: "[Feature] "
+labels: enhancement
+assignees: ''
+---
+
+**Is your feature request related to a problem? Please describe.**
+A clear description of the problem, e.g. "I'm always frustrated when..."
+
+**Describe the solution you'd like**
+What you want to happen.
+
+**Describe alternatives you've considered**
+Any alternative solutions or workarounds you've tried.
+
+**Does this fit PowerSwitch's scope?**
+PowerSwitch intentionally stays minimal (see the Roadmap in README).
+Explain briefly why this belongs in the core tool rather than being handled
+externally.
+
+**Additional context**
+Anything else relevant (links, screenshots, similar tools).
+</file>
+
+<file path=".github/ISSUE_TEMPLATE/pull_request_template.md">
+## What does this PR do?
+
+<!-- Short description of the change and why it's needed -->
+
+## Related issue
+
+Closes #
+
+## Checklist
+
+- [ ] `shellcheck src/power-switch install.sh uninstall.sh tests/test.sh` passes
+- [ ] `./tests/test.sh` passes
+- [ ] Added/updated tests for new behavior
+- [ ] Updated `README.md` if installation, usage, or requirements changed
+- [ ] Kept the change focused (one logical change per PR)
+
+## Notes for reviewers
+
+<!-- Anything that needs special attention, e.g. hardware you couldn't test on -->
+</file>
+
+<file path="CODE_OF_CONDUCT.md">
+# Contributor Covenant Code of Conduct
+
+## Our Pledge
+
+We as members, contributors, and leaders pledge to make participation in
+our community a harassment-free experience for everyone, regardless of
+age, body size, visible or invisible disability, ethnicity, sex
+characteristics, gender identity and expression, level of experience,
+education, socio-economic status, nationality, personal appearance, race,
+religion, or sexual identity and orientation.
+
+## Our Standards
+
+Examples of behavior that contributes to a positive environment:
+
+- Demonstrating empathy and kindness toward other people
+- Being respectful of differing opinions, viewpoints, and experiences
+- Giving and gracefully accepting constructive feedback
+- Accepting responsibility and apologizing to those affected by mistakes
+
+Examples of unacceptable behavior:
+
+- The use of sexualized language or imagery, and sexual attention of any kind
+- Trolling, insulting or derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information without explicit permission
+
+## Enforcement Responsibilities
+
+Project maintainers are responsible for clarifying and enforcing our
+standards of acceptable behavior and will take appropriate and fair
+corrective action in response to any behavior deemed inappropriate,
+threatening, offensive, or harmful.
+
+## Scope
+
+This Code of Conduct applies within all project spaces (issues, pull
+requests, discussions) and when an individual is officially representing
+the project in public spaces.
+
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported to the project maintainer via the contact details on the GitHub
+profile. All complaints will be reviewed and investigated promptly and
+fairly.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant][homepage],
+version 2.1, available at
+https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+
+[homepage]: https://www.contributor-covenant.org
+</file>
+
+<file path="CONTRIBUTING.md">
+# Contributing to PowerSwitch
+
+Thanks for considering a contribution! PowerSwitch aims to stay small,
+readable, and dependency-free, so please keep that in mind when proposing
+changes.
+
+## Getting started
+
+1. Fork the repository and clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/power-switch.git
+   cd power-switch
+   ```
+2. Create a branch for your change:
+   ```bash
+   git checkout -b fix/short-description
+   ```
+3. Make sure you have the runtime dependencies installed locally:
+   - `bash`
+   - `udevadm`
+   - `powerprofilesctl` (from `power-profiles-daemon`)
+   - `shellcheck` (for linting)
+
+## Making changes
+
+- Keep the script POSIX-friendly where practical; the project intentionally
+  avoids Bash-specific features unless they add real value.
+- Every new function should be covered by at least one test in
+  `tests/test.sh`.
+- Run the full check locally before opening a PR:
+  ```bash
+  shellcheck src/power-switch install.sh uninstall.sh tests/test.sh
+  ./tests/test.sh
+  ```
+- Update `README.md` if you change installation steps, behavior, or
+  requirements.
+
+## Commit messages
+
+Use short, imperative commit messages (e.g. `Add dry-run mode`, not
+`Added dry-run mode` or `dry run stuff`).
+
+## Pull requests
+
+- Describe **what** changed and **why**, not just a summary of the diff.
+- Link any related issue with `Closes #123` if applicable.
+- Keep PRs focused — one logical change per PR is easier to review and
+  merge quickly.
+- CI (ShellCheck + tests) must pass before a PR can be merged.
+
+## Reporting bugs / requesting features
+
+Please use the issue templates provided when opening a new issue — they
+make sure we get the information needed to reproduce or evaluate a request
+on the first pass.
+
+## Code of Conduct
+
+This project follows the [Code of Conduct](CODE_OF_CONDUCT.md). By
+participating, you agree to uphold it.
+</file>
+
+<file path=".github/workflows/ci.yml">
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on all scripts
+        run: |
+          shellcheck src/power-switch
+          shellcheck install.sh
+          shellcheck uninstall.sh
+          shellcheck tests/test.sh
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y power-profiles-daemon
+
+      - name: Run tests
+        run: ./tests/test.sh
+</file>
+
+<file path="src/power-switch">
+#!/bin/bash
+
+set -u
+
+
+log() {
+    echo "[PowerSwitch] $*"
+}
+
+
+error() {
+    echo "[PowerSwitch] ERROR: $*" >&2
+}
+
+
+shutdown() {
+    log "PowerSwitch stopped"
+    exit 0
+}
+
+
+find_ac_adapter() {
+    for device in /sys/class/power_supply/*; do
+        [ -f "$device/type" ] || continue
+
+        device_type="$(cat "$device/type" 2>/dev/null)" || continue
+
+        if [ "$device_type" = "Mains" ]; then
+            echo "$device"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+
+get_power_state() {
+    local ac_adapter="$1"
+    local online
+
+    if [ ! -f "$ac_adapter/online" ]; then
+        error "AC adapter status file not found: $ac_adapter/online"
+        return 1
+    fi
+
+    online="$(cat "$ac_adapter/online" 2>/dev/null)" || {
+        error "Failed to read AC adapter status."
+        return 1
+    }
+
+    if [ "$online" = "1" ]; then
+        echo "ac"
+    elif [ "$online" = "0" ]; then
+        echo "battery"
+    else
+        error "Unknown AC adapter status: $online"
+        return 1
+    fi
+}
+
+
+apply_power_profile() {
+    local power_state="$1"
+    local target_profile
+    local current_profile
+
+    if [ "$power_state" = "ac" ]; then
+        target_profile="performance"
+    elif [ "$power_state" = "battery" ]; then
+        target_profile="power-saver"
+    else
+        error "Unknown power state: $power_state"
+        return 1
+    fi
+
+    current_profile="$(powerprofilesctl get 2>/dev/null)" || {
+        error "Failed to get current power profile."
+        return 1
+    }
+
+    if [ "$current_profile" = "$target_profile" ]; then
+        log "Power profile already set to: $target_profile"
+        return 0
+    fi
+
+    log "Changing power profile: $current_profile -> $target_profile"
+
+    if powerprofilesctl set "$target_profile"; then
+        log "Power profile changed to: $target_profile"
+    else
+        error "Failed to set power profile to: $target_profile"
+        return 1
+    fi
+}
+
+
+main() {
+    
+    trap shutdown SIGTERM
+    trap shutdown SIGINT
+    log "Starting PowerSwitch"
+
+
+    if ! command -v udevadm >/dev/null 2>&1; then
+        error "udevadm is not installed."
+        exit 1
+    fi
+
+    if ! command -v powerprofilesctl >/dev/null 2>&1; then
+        error "powerprofilesctl is not installed."
+        exit 1
+    fi
+
+
+    AC_ADAPTER="$(find_ac_adapter)"
+
+    if [ -z "$AC_ADAPTER" ]; then
+        error "No AC adapter found."
+        exit 1
+    fi
+
+
+    AC_NAME="$(basename "$AC_ADAPTER")"
+
+
+    log "AC adapter: $AC_ADAPTER"
+    log "AC adapter name: $AC_NAME"
+
+
+    CURRENT_STATE="$(get_power_state "$AC_ADAPTER")" || exit 1
+
+    log "Current power state: $CURRENT_STATE"
+
+
+    apply_power_profile "$CURRENT_STATE" || exit 1
+
+
+    log "Waiting for power events..."
+
+
+    udevadm monitor --kernel --subsystem-match=power_supply |
+    while read -r line; do
+
+        if echo "$line" | grep -q "/power_supply/$AC_NAME"; then
+
+            NEW_STATE="$(get_power_state "$AC_ADAPTER")" || continue
+
+            if [ "$NEW_STATE" != "$CURRENT_STATE" ]; then
+
+                CURRENT_STATE="$NEW_STATE"
+
+                log "Power state changed: $CURRENT_STATE"
+
+                apply_power_profile "$CURRENT_STATE"
+
+            fi
+
+        fi
+
+    done
+}
+
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main
+fi
+</file>
+
+<file path="systemd/power-switch.service">
+[Unit]
+Description=PowerSwitch - Automatic power profile switching
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/power-switch
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+</file>
+
+<file path="tests/test.sh">
+#!/bin/bash
+
+set -u
+
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SOURCE_FILE="$PROJECT_ROOT/src/power-switch"
+
+
+PASS=0
+FAIL=0
+
+
+pass() {
+    echo "PASS: $1"
+    PASS=$((PASS + 1))
+}
+
+
+fail() {
+    echo "FAIL: $1"
+    FAIL=$((FAIL + 1))
+}
+
+
+test_file_exists() {
+    if [ -f "$SOURCE_FILE" ]; then
+        pass "source file exists"
+    else
+        fail "source file exists"
+    fi
+}
+
+
+test_executable() {
+    if [ -x "$SOURCE_FILE" ]; then
+        pass "source file is executable"
+    else
+        fail "source file is executable"
+    fi
+}
+
+
+test_syntax() {
+    if bash -n "$SOURCE_FILE"; then
+        pass "bash syntax is valid"
+    else
+        fail "bash syntax is valid"
+    fi
+}
+
+
+test_function_exists() {
+    local function_name="$1"
+
+    if grep -q "^${function_name}()" "$SOURCE_FILE"; then
+        pass "function exists: $function_name"
+    else
+        fail "function exists: $function_name"
+    fi
+}
+
+
+test_command_exists() {
+    local command_name="$1"
+
+    if command -v "$command_name" >/dev/null 2>&1; then
+        pass "command exists: $command_name"
+    else
+        fail "command exists: $command_name"
+    fi
+}
+
+
+test_get_power_state_ac() {
+    local temp_dir
+    temp_dir="$(mktemp -d)"
+
+    echo "1" > "$temp_dir/online"
+
+    if [ "$(get_power_state "$temp_dir")" = "ac" ]; then
+        pass "get_power_state detects AC"
+    else
+        fail "get_power_state detects AC"
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+
+test_get_power_state_battery() {
+    local temp_dir
+    temp_dir="$(mktemp -d)"
+
+    echo "0" > "$temp_dir/online"
+
+    if [ "$(get_power_state "$temp_dir")" = "battery" ]; then
+        pass "get_power_state detects battery"
+    else
+        fail "get_power_state detects battery"
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+
+test_get_power_state_invalid() {
+    local temp_dir
+    temp_dir="$(mktemp -d)"
+
+    echo "2" > "$temp_dir/online"
+
+    if get_power_state "$temp_dir" >/dev/null 2>&1; then
+        fail "get_power_state rejects invalid status"
+    else
+        pass "get_power_state rejects invalid status"
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+
+test_get_power_state_missing_file() {
+    local temp_dir
+    temp_dir="$(mktemp -d)"
+
+    if get_power_state "$temp_dir" >/dev/null 2>&1; then
+        fail "get_power_state handles missing online file"
+    else
+        pass "get_power_state handles missing online file"
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+
+
+
+
+
+
+echo "Running PowerSwitch tests..."
+echo
+
+
+test_file_exists
+test_executable
+test_syntax
+
+test_function_exists "find_ac_adapter"
+test_function_exists "get_power_state"
+test_function_exists "apply_power_profile"
+test_function_exists "main"
+
+test_command_exists "bash"
+test_command_exists "udevadm"
+test_command_exists "powerprofilesctl"
+
+
+source "$SOURCE_FILE"
+
+
+test_get_power_state_ac
+test_get_power_state_battery
+test_get_power_state_invalid
+test_get_power_state_missing_file
+
+
+echo
+echo "--------------------------------"
+echo "Passed: $PASS"
+echo "Failed: $FAIL"
+echo "--------------------------------"
+
+
+if [ "$FAIL" -eq 0 ]; then
+    echo "All tests passed."
+    exit 0
+else
+    echo "Some tests failed."
+    exit 1
+fi
+</file>
+
+<file path=".gitignore">
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*~
+
+# Test / coverage artifacts
+.coverage
+coverage/
+.pytest_cache/
+
+# ShellCheck / tooling
+.shellcheckrc.local
+
+# Local development files
+.env
+.env.*
+</file>
+
+<file path="install.sh">
+#!/bin/bash
+
+set -u
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+SOURCE_FILE="$PROJECT_DIR/src/power-switch"
+SERVICE_FILE="$PROJECT_DIR/systemd/power-switch.service"
+
+BIN_DIR="$HOME/.local/bin"
+SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
+
+INSTALL_PATH="$BIN_DIR/power-switch"
+INSTALLED_SERVICE="$SYSTEMD_USER_DIR/power-switch.service"
+
+
+error() {
+    echo "[PowerSwitch] ERROR: $*" >&2
+}
+
+
+log() {
+    echo "[PowerSwitch] $*"
+}
+
+
+check_command() {
+    local command_name="$1"
+
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        error "Required command not found: $command_name"
+        return 1
+    fi
+}
+
+
+main() {
+    log "Installing PowerSwitch..."
+
+    if [ ! -f "$SOURCE_FILE" ]; then
+        error "Source file not found: $SOURCE_FILE"
+        exit 1
+    fi
+
+    if [ ! -f "$SERVICE_FILE" ]; then
+        error "Service file not found: $SERVICE_FILE"
+        exit 1
+    fi
+
+    check_command systemctl || exit 1
+    check_command udevadm || exit 1
+    check_command powerprofilesctl || exit 1
+
+    mkdir -p "$BIN_DIR"
+    mkdir -p "$SYSTEMD_USER_DIR"
+
+    chmod +x "$SOURCE_FILE"
+
+    cp "$SOURCE_FILE" "$INSTALL_PATH"
+    cp "$SERVICE_FILE" "$INSTALLED_SERVICE"
+
+    systemctl --user daemon-reload
+
+    systemctl --user enable power-switch.service
+    systemctl --user restart power-switch.service
+
+    log "PowerSwitch installed successfully."
+    log "Executable: $INSTALL_PATH"
+    log "Service: $INSTALLED_SERVICE"
+    log "Service status:"
+
+    systemctl --user --no-pager --full status power-switch.service
+}
+
+
+main
+</file>
+
+<file path="LICENSE">
+MIT License
+
+Copyright (c) 2026 Arash Amery
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</file>
+
+<file path="README.md">
+# PowerSwitch
+
+> Automatically switch your Linux power profile when you plug in or unplug your laptop. PowerSwitch listens for power-supply events through udev and applies the appropriate `powerprofilesctl` profile without polling.
+
+![Shell](https://img.shields.io/badge/shell-bash-green.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Linux-lightgrey.svg)
+
+---
+
+## Why PowerSwitch?
+
+Power management tools can be much larger than what you need if all you want is automatic profile switching.
+
+PowerSwitch focuses on one task:
+
+> Listen for AC adapter events → apply the appropriate power profile.
+
+It uses an event-driven approach instead of repeatedly polling the system.
+
+| Feature                      | PowerSwitch                 | TLP                   | auto-cpufreq           |
+| ---------------------------- | --------------------------- | --------------------- | ---------------------- |
+| Event-driven power switching | ✅                           | ❌                     | ❌                      |
+| Main purpose                 | Profile switching           | Full power management | CPU/power optimization |
+| Runtime                      | Bash + systemd user service | Multiple components   | Python + daemon        |
+| Configuration required       | None                        | Optional/configurable | Optional/configurable  |
+
+---
+
+## Features
+
+* ⚡ **Event-driven** — reacts to power-supply events using `udevadm`
+* 🪶 **Lightweight** — a small Bash daemon with a systemd user service
+* 🔌 **Automatic AC detection** — discovers the AC adapter through the Linux `power_supply` subsystem
+* 🛠️ **Simple installation** — install and uninstall with a single command
+* 🛑 **Graceful shutdown** — handles `SIGTERM` and `SIGINT`
+* 🔄 **Boot-time synchronization** — applies the correct profile when the service starts
+* ✅ **Tested** — includes automated tests and ShellCheck validation
+
+---
+
+## How it works
+
+PowerSwitch maps the current power state to a power profile:
+
+| Power State      | Profile       |
+| ---------------- | ------------- |
+| 🔌 AC plugged in | `performance` |
+| 🔋 On battery    | `power-saver` |
+
+When the service starts, PowerSwitch:
+
+1. Detects the available AC adapter.
+2. Reads its current `online` state.
+3. Applies the corresponding power profile.
+4. Starts listening for power-supply events.
+5. Changes the profile only when the power state changes.
+
+While waiting for events, the daemon remains idle instead of continuously polling the system.
+
+---
+
+## Requirements
+
+* Linux with `systemd` user services
+* Bash
+* `udevadm`
+* [`power-profiles-daemon`](https://gitlab.freedesktop.org/upower/power-profiles-daemon) providing `powerprofilesctl`
+
+**Tested on:** Ubuntu Linux
+
+> PowerSwitch is intended for Linux systems using `systemd`, `udev`, and `power-profiles-daemon`. Compatibility with other distributions may depend on their power-management configuration.
+
+---
+
+## Installation
+
+Clone the repository and run the installer:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/power-switch.git
+cd power-switch
+./install.sh
+```
+
+The installer:
+
+1. Copies the PowerSwitch executable to `~/.local/bin/power-switch`
+2. Installs the systemd user service
+3. Reloads the systemd user manager
+4. Enables the service
+5. Starts the service
+
+Check the service status:
+
+```bash
+systemctl --user status power-switch.service
+```
+
+You should see:
+
+```text
+Active: active (running)
+```
+
+---
+
+## Service management
+
+Check whether the service is running:
+
+```bash
+systemctl --user is-active power-switch.service
+```
+
+Restart the service:
+
+```bash
+systemctl --user restart power-switch.service
+```
+
+Stop the service:
+
+```bash
+systemctl --user stop power-switch.service
+```
+
+View service logs:
+
+```bash
+journalctl --user -u power-switch.service
+```
+
+Follow logs in real time:
+
+```bash
+journalctl --user -u power-switch.service -f
+```
+
+---
+
+## Manual usage
+
+The installed executable can also be run directly:
+
+```bash
+~/.local/bin/power-switch
+```
+
+This is useful for development and debugging.
+
+Press `Ctrl+C` to stop it gracefully.
+
+---
+
+## Testing
+
+Run the project test suite:
+
+```bash
+./tests/test.sh
+```
+
+The test suite checks the project structure, core implementation, required behavior, and ShellCheck validation.
+
+You can also run ShellCheck directly:
+
+```bash
+shellcheck src/power-switch
+```
+
+---
+
+## Uninstallation
+
+From the project directory:
+
+```bash
+./uninstall.sh
+```
+
+The uninstaller:
+
+* Stops the service
+* Disables the service
+* Removes the installed systemd user service
+* Removes the installed executable
+
+The source code in the project directory is not removed.
+
+---
+
+## Project structure
+
+```text
+power-switch/
+├── src/
+│   └── power-switch           # Main daemon script
+├── systemd/
+│   └── power-switch.service   # systemd user service unit
+├── tests/
+│   └── test.sh                # Test suite + ShellCheck
+├── install.sh                 # Installation script
+├── uninstall.sh               # Uninstallation script
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Roadmap
+
+* [ ] Configurable power profiles
+* [ ] Support for multiple AC adapters
+* [ ] `--once` mode for testing
+* [ ] Dry-run mode
+* [ ] Optional desktop notifications
+* [ ] Error scenario tests
+* [ ] GitHub Actions CI
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+Before submitting a pull request, run:
+
+```bash
+./tests/test.sh
+```
+
+Make sure all tests pass and ShellCheck reports no issues.
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+</file>
+
+<file path="uninstall.sh">
+#!/bin/bash
+
+set -u
+
+INSTALL_PATH="$HOME/.local/bin/power-switch"
+INSTALLED_SERVICE="$HOME/.config/systemd/user/power-switch.service"
+
+
+log() {
+    echo "[PowerSwitch] $*"
+}
+
+
+main() {
+    log "Uninstalling PowerSwitch..."
+
+    if systemctl --user is-active --quiet power-switch.service; then
+        log "Stopping PowerSwitch service..."
+        systemctl --user stop power-switch.service
+    fi
+
+    if systemctl --user is-enabled --quiet power-switch.service; then
+        log "Disabling PowerSwitch service..."
+        systemctl --user disable power-switch.service
+    fi
+
+    if [ -f "$INSTALLED_SERVICE" ]; then
+        rm -f "$INSTALLED_SERVICE"
+        log "Removed service file."
+    fi
+
+    if [ -f "$INSTALL_PATH" ]; then
+        rm -f "$INSTALL_PATH"
+        log "Removed executable."
+    fi
+
+    systemctl --user daemon-reload
+
+    log "PowerSwitch has been uninstalled."
+}
+
+
+main
+</file>
+
+</files>

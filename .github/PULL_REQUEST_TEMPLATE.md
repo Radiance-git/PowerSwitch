@@ -8,7 +8,7 @@ Closes #
 
 ## Checklist
 
-- [ ] `shellcheck src/power-switch install.sh uninstall.sh tests/test.sh` passes
+- [ ] `shellcheck src/power-switch install.sh uninstall.sh` passes
 - [ ] `./tests/test.sh` passes
 - [ ] Added/updated tests for new behavior
 - [ ] Updated `README.md` if installation, usage, or requirements changed
